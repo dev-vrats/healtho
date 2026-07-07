@@ -1,65 +1,124 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { motion, Variants } from "framer-motion";
+import { Upload, Target, Heart, Leaf, ChevronRight } from "lucide-react";
+import { mockData } from "@/lib/mockData";
+import { TimelineStrip } from "@/components/TimelineStrip";
+import { VitalityScoreCard, BiologicalAgeCard, PendingResultCard } from "@/components/HeroCards";
+import { QuickActionCard, BiomarkerCard, ProductCard, StatusPill } from "@/components/UIPrimitives";
+import Link from "next/link";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 }
+  }
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+export default function Dashboard() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <motion.div 
+      variants={containerVariants} 
+      initial="hidden" 
+      animate="show"
+      className="max-w-4xl mx-auto flex flex-col gap-10 pb-20"
+    >
+      {/* Header section */}
+      <motion.div variants={itemVariants} className="space-y-4">
+        <h1 className="text-[44px] font-medium tracking-tight leading-tight">
+          {mockData.user.name}
+        </h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusPill variant="neutral">Total {mockData.summary.total}</StatusPill>
+          <StatusPill variant="highlight">{mockData.summary.optimal} Optimal</StatusPill>
+          <StatusPill variant="neutral">{mockData.summary.inRange} In range</StatusPill>
+          <StatusPill variant="neutral">{mockData.summary.outOfRange} Out of range</StatusPill>
+        </div>
+      </motion.div>
+
+      {/* Timeline */}
+      <motion.div variants={itemVariants} className="w-full">
+        <TimelineStrip 
+          history={mockData.trend.history} 
+          insightLabel={mockData.trend.label}
+          insightDelta={mockData.trend.delta}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <QuickActionCard 
+          icon={Upload} 
+          title="Upload Records" 
+          description="Add historical data or external lab results." 
+        />
+        <QuickActionCard 
+          icon={Target} 
+          title="Connect Tracker" 
+          description="Sync your wearable for continuous insights."
+          colorClass="text-[var(--color-pink-soft)]"
+        />
+      </motion.div>
+
+      {/* Hero Cards */}
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-6">
+        <VitalityScoreCard value={mockData.scores.vitalityScore.value} status={mockData.scores.vitalityScore.status} />
+        <BiologicalAgeCard age={mockData.scores.biologicalAge.value} deltaLabel={mockData.scores.biologicalAge.deltaLabel} />
+        <PendingResultCard min={mockData.pendingResults.etaDaysMin} max={mockData.pendingResults.etaDaysMax} note={mockData.pendingResults.note} />
+      </motion.div>
+
+      {/* Biomarkers */}
+      <motion.div variants={itemVariants} className="space-y-6 pt-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="text-[28px] font-medium mb-1 tracking-tight">Biomarkers</h2>
+            <p className="text-[15px] text-[var(--color-secondary)]">A snapshot of what's happening inside your body.</p>
+          </div>
+          <Link href="/data" className="text-[14px] font-medium text-[var(--color-secondary)] hover:text-[var(--color-primary)] flex items-center gap-1 transition-colors">
+            See all <ChevronRight size={16} />
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {mockData.biomarkers.map((bm, i) => (
+             <BiomarkerCard 
+               key={i}
+               icon={bm.category === "heart" ? Heart : Leaf}
+               label={bm.label}
+               value={bm.value}
+               unit={bm.unit}
+               status={bm.status}
+             />
+          ))}
         </div>
-      </main>
-    </div>
+      </motion.div>
+
+      {/* Recommendations */}
+      <motion.div variants={itemVariants} className="space-y-6 pt-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="text-[28px] font-medium mb-1 tracking-tight">Recommended for You</h2>
+          </div>
+          <button className="text-[14px] font-medium text-[var(--color-secondary)] hover:text-[var(--color-primary)] flex items-center gap-1 transition-colors">
+            See all <ChevronRight size={16} />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {mockData.recommendations.map((rec, i) => (
+             <ProductCard 
+               key={i}
+               name={rec.name}
+               price={rec.price}
+               tag={rec.tag}
+             />
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }

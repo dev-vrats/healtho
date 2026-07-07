@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-surface-alt: var(--bg-surface-alt);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-hairline: var(--border-hairline);
+
+  --color-accent-lime: var(--accent-lime);
+  --color-accent-lime-ink: var(--accent-lime-ink);
+
+  --color-green-deep: var(--status-green-deep);
+  --color-green-soft: var(--status-green-soft);
+  --color-orange-deep: var(--status-orange-deep);
+  --color-orange-soft: var(--status-orange-soft);
+  --color-blue-soft: var(--status-blue-soft);
+  --color-pink-deep: var(--status-pink-deep);
+  --color-pink-soft: var(--status-pink-soft);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+
+  --radius-lg: var(--radius-lg);
+  --radius-md: var(--radius-md);
+  --radius-sm: var(--radius-sm);
+  --radius-pill: var(--radius-pill);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Neutrals */
+  --bg-canvas: #F0F0EE;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F7F7F5;
+  --text-primary: #1A1714;
+  --text-secondary: #8C8C86;
+  --border-hairline: #E5E4E1;
+
+  /* Accent */
+  --accent-lime: #DCEF1B;
+  --accent-lime-ink: #1A1714;
+
+  /* Status / gradient stops */
+  --status-green-deep: #1F7D28;
+  --status-green-soft: #A9D66B;
+  --status-orange-deep: #F3870F;
+  --status-orange-soft: #F2C185;
+  --status-blue-soft: #9BB9F3;
+  --status-pink-deep: #C23B5E;
+  --status-pink-soft: #EC4C7E;
+
+  /* Elevation */
+  --shadow-card: 0 12px 40px rgba(20, 20, 15, 0.06);
+  --shadow-card-hover: 0 20px 55px rgba(20, 20, 15, 0.10);
+
+  /* Radii */
+  --radius-lg: 32px;
+  --radius-md: 24px;
+  --radius-sm: 16px;
+  --radius-pill: 999px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
