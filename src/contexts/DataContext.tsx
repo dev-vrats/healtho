@@ -47,8 +47,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
       try {
         const docSnap = await getDoc(userDocRef);
         if (!docSnap.exists()) {
+          // Customize the baseline data with the user's actual name/email
+          const userName = user.displayName || user.email?.split('@')[0] || "User";
+          const capitalizedName = userName.charAt(0).toUpperCase() + userName.slice(1);
+          
+          const seededData = {
+            ...mockData,
+            user: { name: capitalizedName }
+          };
+
           // Seed with baseline data
-          await setDoc(userDocRef, mockData);
+          await setDoc(userDocRef, seededData);
         }
       } catch (err: any) {
         console.error("Error initializing data:", err);
