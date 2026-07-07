@@ -24,7 +24,7 @@ const itemVariants: Variants = {
 };
 
 export default function Dashboard() {
-  const { data, loading } = useData();
+  const { data, loading, error } = useData();
   const [insight, setInsight] = useState("");
 
   useEffect(() => {
@@ -33,6 +33,37 @@ export default function Dashboard() {
       generateHealthInsight(data.biomarkers).then(setInsight);
     }
   }, [data]);
+
+  if (error) return (
+    <div className="flex flex-col justify-center items-center h-[50vh] text-center max-w-md mx-auto">
+      <div className="text-red-500 mb-4">
+        <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h2 className="text-[20px] font-medium mb-2">Setup Required</h2>
+      <p className="text-[15px] text-[var(--color-secondary)]">{error}</p>
+      <div className="mt-6 text-[14px] bg-[var(--color-surface)] p-4 rounded-xl border border-[var(--color-hairline)] text-left w-full">
+        <p className="font-medium mb-2">How to fix:</p>
+        <ol className="list-decimal pl-4 space-y-1 text-[var(--color-secondary)]">
+          <li>Go to Firebase Console</li>
+          <li>Select <strong>Firestore Database</strong></li>
+          <li>Click the <strong>Rules</strong> tab</li>
+          <li>Replace everything with:</li>
+        </ol>
+        <pre className="mt-3 bg-black/5 p-3 rounded-lg overflow-x-auto text-xs font-mono text-[var(--color-primary)]">
+{`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}`}
+        </pre>
+      </div>
+    </div>
+  );
 
   if (loading || !data) return (
     <div className="flex justify-center items-center h-[50vh]">
