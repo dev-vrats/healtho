@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { FileText, Upload, Calendar } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { UploadModal } from "@/components/UploadModal";
 
 export default function RecordsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,7 +39,10 @@ export default function RecordsPage() {
     >
       <div className="flex items-center justify-between mb-12">
         <h1 className="text-[44px] font-medium tracking-tight leading-tight">Records</h1>
-        <button className="flex items-center gap-2 bg-[var(--color-primary)] text-white px-5 py-2.5 rounded-[var(--radius-pill)] text-[14px] font-medium hover:opacity-90 transition-opacity">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-[var(--color-primary)] text-white px-5 py-2.5 rounded-[var(--radius-pill)] text-[14px] font-medium hover:opacity-90 transition-opacity"
+        >
           <Upload size={16} strokeWidth={1.5} />
           Upload Record
         </button>
@@ -71,6 +76,8 @@ export default function RecordsPage() {
           </div>
         ))}
       </div>
+
+      <UploadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </motion.div>
   );
 }

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useData } from "@/contexts/DataContext";
 import { useEffect, useState } from "react";
 import { generateHealthInsight } from "@/lib/ai";
+import { UploadModal } from "@/components/UploadModal";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -26,10 +27,10 @@ const itemVariants: Variants = {
 export default function Dashboard() {
   const { data, loading, error } = useData();
   const [insight, setInsight] = useState("");
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   useEffect(() => {
     if (data && data.biomarkers) {
-      // Fetch AI insight when data is ready
       generateHealthInsight(data.biomarkers).then(setInsight);
     }
   }, [data]);
@@ -102,11 +103,13 @@ service cloud.firestore {
 
       {/* Quick Actions */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <QuickActionCard 
-          icon={Upload} 
-          title="Upload Records" 
-          description="Add historical data or external lab results." 
-        />
+        <div onClick={() => setIsUploadModalOpen(true)} className="cursor-pointer">
+          <QuickActionCard 
+            icon={Upload} 
+            title="Upload Records" 
+            description="Add historical data or external lab results." 
+          />
+        </div>
         <QuickActionCard 
           icon={Target} 
           title="Connect Tracker" 
@@ -168,6 +171,11 @@ service cloud.firestore {
           ))}
         </div>
       </motion.div>
+
+      <UploadModal 
+        isOpen={isUploadModalOpen} 
+        onClose={() => setIsUploadModalOpen(false)} 
+      />
     </motion.div>
   );
 }
