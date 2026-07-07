@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { TopNav } from "@/components/TopNav";
+import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Healtho",
-  description: "Personal health-intelligence dashboard",
+  title: "Healtho | Your Body, Simplified",
+  description: "A calm, single-glance picture of your health.",
 };
 
 export default function RootLayout({
@@ -19,12 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans tabular-nums bg-[var(--color-canvas)] text-[var(--color-primary)]">
-        <TopNav />
-        <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 py-8">
-          {children}
-        </main>
+    <html lang="en">
+      <body className={`${inter.className} text-[var(--color-primary)] antialiased`}>
+        <Providers>
+          <div className="min-h-screen bg-[var(--color-canvas)]">
+            <TopNav />
+            <main className="px-6 md:px-12 py-10">
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

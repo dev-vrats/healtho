@@ -2,26 +2,44 @@
 
 import { motion, Variants } from "framer-motion";
 import { Upload, Target, Heart, Leaf, ChevronRight } from "lucide-react";
-import { mockData } from "@/lib/mockData";
 import { TimelineStrip } from "@/components/TimelineStrip";
 import { VitalityScoreCard, BiologicalAgeCard, PendingResultCard } from "@/components/HeroCards";
 import { QuickActionCard, BiomarkerCard, ProductCard, StatusPill } from "@/components/UIPrimitives";
 import Link from "next/link";
+import { useData } from "@/contexts/DataContext";
+import { useEffect, useState } from "react";
+import { generateHealthInsight } from "@/lib/ai";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.06 }
+    transition: { staggerChildren: 0.1 }
   }
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
 export default function Dashboard() {
+  const { data, loading } = useData();
+  const [insight, setInsight] = useState("");
+
+  useEffect(() => {
+    if (data && data.biomarkers) {
+      // Fetch AI insight when data is ready
+      generateHealthInsight(data.biomarkers).then(setInsight);
+    }
+  }, [data]);
+
+  if (loading || !data) return (
+    <div className="flex justify-center items-center h-[50vh]">
+      <div className="w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
   return (
     <motion.div 
       variants={containerVariants} 
@@ -32,22 +50,22 @@ export default function Dashboard() {
       {/* Header section */}
       <motion.div variants={itemVariants} className="space-y-4">
         <h1 className="text-[44px] font-medium tracking-tight leading-tight">
-          {mockData.user.name}
+          {data.user.name}
         </h1>
         <div className="flex flex-wrap items-center gap-3">
-          <StatusPill variant="neutral">Total {mockData.summary.total}</StatusPill>
-          <StatusPill variant="highlight">{mockData.summary.optimal} Optimal</StatusPill>
-          <StatusPill variant="neutral">{mockData.summary.inRange} In range</StatusPill>
-          <StatusPill variant="neutral">{mockData.summary.outOfRange} Out of range</StatusPill>
+          <StatusPill variant="neutral">Total {data.summary.total}</StatusPill>
+          <StatusPill variant="highlight">{data.summary.optimal} Optimal</StatusPill>
+          <StatusPill variant="neutral">{data.summary.inRange} In range</StatusPill>
+          <StatusPill variant="neutral">{data.summary.outOfRange} Out of range</StatusPill>
         </div>
       </motion.div>
 
       {/* Timeline */}
       <motion.div variants={itemVariants} className="w-full">
         <TimelineStrip 
-          history={mockData.trend.history} 
-          insightLabel={mockData.trend.label}
-          insightDelta={mockData.trend.delta}
+          history={data.trend.history} 
+          insightLabel={insight || "Analyzing your data..."}
+          insightDelta={data.trend.delta}
         />
       </motion.div>
 
@@ -68,9 +86,9 @@ export default function Dashboard() {
 
       {/* Hero Cards */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-6">
-        <VitalityScoreCard value={mockData.scores.vitalityScore.value} status={mockData.scores.vitalityScore.status} />
-        <BiologicalAgeCard age={mockData.scores.biologicalAge.value} deltaLabel={mockData.scores.biologicalAge.deltaLabel} />
-        <PendingResultCard min={mockData.pendingResults.etaDaysMin} max={mockData.pendingResults.etaDaysMax} note={mockData.pendingResults.note} />
+        <VitalityScoreCard value={data.scores.vitalityScore.value} status={data.scores.vitalityScore.status} />
+        <BiologicalAgeCard age={data.scores.biologicalAge.value} deltaLabel={data.scores.biologicalAge.deltaLabel} />
+        <PendingResultCard min={data.pendingResults.etaDaysMin} max={data.pendingResults.etaDaysMax} note={data.pendingResults.note} />
       </motion.div>
 
       {/* Biomarkers */}
@@ -85,7 +103,7 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {mockData.biomarkers.map((bm, i) => (
+          {data.biomarkers.map((bm: any, i: number) => (
              <BiomarkerCard 
                key={i}
                icon={bm.category === "heart" ? Heart : Leaf}
@@ -109,7 +127,7 @@ export default function Dashboard() {
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {mockData.recommendations.map((rec, i) => (
+          {data.recommendations.map((rec: any, i: number) => (
              <ProductCard 
                key={i}
                name={rec.name}

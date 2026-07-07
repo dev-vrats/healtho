@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { User, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { User, Activity, LogOut } from "lucide-react";
+import clsx from "clsx";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function TopNav() {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
 
   const links = [
     { href: "/", label: "Dashboard" },
@@ -15,42 +17,67 @@ export function TopNav() {
   ];
 
   return (
-    <header className="w-full bg-[var(--color-surface)] z-50 sticky top-0 border-b border-[var(--color-hairline)] shadow-[0_4px_20px_rgba(20,20,15,0.02)]">
-      <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
-        <div className="flex items-center gap-12">
+    <nav className="w-full border-b border-[var(--color-hairline)] bg-[var(--color-canvas)] sticky top-0 z-50">
+      <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-10">
           {/* Logo */}
-          <Link href="/" className="font-medium text-[20px] tracking-tight flex items-center gap-3 text-[var(--color-primary)]">
-            <div className="w-7 h-7 rounded-full bg-[var(--color-accent-lime)]" />
-            Healtho
+          <Link href="/" className="flex items-center gap-2 text-[var(--color-primary)] font-medium">
+            <div className="w-7 h-7 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
+              <Activity size={16} color="white" />
+            </div>
+            <span className="text-[17px] tracking-tight">Healtho</span>
           </Link>
           
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            {links.map(link => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={cn(
-                  "text-[15px] font-medium transition-colors",
-                  pathname === link.href ? "text-[var(--color-primary)]" : "text-[var(--color-secondary)] hover:text-[var(--color-primary)]"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Navigation Links - Only show if logged in */}
+          {user && (
+            <div className="hidden md:flex items-center gap-8">
+              {links.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link 
+                    key={link.href}
+                    href={link.href}
+                    className={clsx(
+                      "text-[14px] font-medium transition-colors relative",
+                      isActive ? "text-[var(--color-primary)]" : "text-[var(--color-secondary)] hover:text-[var(--color-primary)]"
+                    )}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <span className="absolute -bottom-[21px] left-0 w-full h-0.5 bg-[var(--color-primary)] rounded-t-sm" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--color-canvas)] text-[var(--color-primary)] hover:bg-[var(--color-surface-alt)] transition-colors">
-            <ShoppingCart size={18} strokeWidth={1.5} />
-          </button>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--color-canvas)] text-[var(--color-primary)] hover:bg-[var(--color-surface-alt)] transition-colors">
-            <User size={18} strokeWidth={1.5} />
-          </button>
+        {/* Profile / Actions */}
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <button 
+                onClick={signOut}
+                className="text-[14px] font-medium text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-2"
+              >
+                <LogOut size={16} />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+              <div className="w-9 h-9 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline)] flex items-center justify-center text-[var(--color-secondary)]">
+                <User size={18} />
+              </div>
+            </>
+          ) : (
+            <Link 
+              href="/login"
+              className="text-[14px] font-medium text-white bg-[var(--color-primary)] px-4 py-2 rounded-[var(--radius-pill)] hover:opacity-90 transition-opacity"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
-    </header>
+    </nav>
   );
 }

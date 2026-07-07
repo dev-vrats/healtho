@@ -2,8 +2,26 @@
 
 import { motion } from "framer-motion";
 import { FileText, Upload, Calendar } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function RecordsPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) return (
+    <div className="flex justify-center items-center h-[50vh]">
+      <div className="w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
   const records = [
     { id: 1, name: "Comprehensive Metabolic Panel", date: "June 01, 2026", type: "Lab Report" },
     { id: 2, name: "Lipid Panel", date: "May 15, 2026", type: "Lab Report" },
@@ -26,7 +44,7 @@ export default function RecordsPage() {
       </div>
 
       <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] overflow-hidden">
-        {records.map((record, index) => (
+        {records.map((record) => (
           <div 
             key={record.id} 
             className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-[var(--color-hairline)] last:border-0 hover:bg-[var(--color-surface-alt)] transition-colors cursor-pointer group"
